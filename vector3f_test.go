@@ -18,8 +18,8 @@ func AreAlmostEqual(x, y float64) bool {
 }
 
 func TestDot(t *testing.T) {
-	v := Vector3f{[]float64{1.0, 2.0, 3.0}}
-	u := Vector3f{[]float64{4.2, 5.1, -2.3}}
+	v := Vector3f{1.0, 2.0, 3.0}
+	u := Vector3f{4.2, 5.1, -2.3}
 	const r = 7.5
 	if x := v.Dot(&u); !AreAlmostEqual(x, r) {
 		t.Errorf("%v Dot %v = %v, want %v", v, u, x, r)

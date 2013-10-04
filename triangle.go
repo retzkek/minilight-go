@@ -65,3 +65,39 @@ func (t *Triangle) Bound() []float64 {
 		}
 	}
 }
+
+// Intersection tests if a ray intersects a triangle, and returns the distance
+// along the ray that the intersection occurs if so.
+func (t *Triangle) Intersection(origin, direction *Vector3f) (isHit bool, hitDistance float64) {
+	hitDistance := 0.0
+	isHit := false
+
+	// make vectors for two edges sharing vertex 0
+	edge1 := t.Vertices[1].Sub(t.Vertices[0])
+	edge2 := t.Vertices[2].Sub(t.Vertices[0])
+
+	// begin calculating determinant
+	pvec := direction.Cross(&edge2)
+
+	// if determinant is near zero, ray lies in plane of triangle
+	if det := edge1.Dot(pvec); (det <= -EPSILON) | (det >= EPSILON) {
+		inv_det := 1.0 / det
+
+		// calculate distance from vertex 0 to ray origin
+		tvec := origin.Sub(&t.Vertices[0])
+
+		// calculate U parameter and test bounds
+		if u := tvec.Dot(&pvec) * inv_det; (u >= 0.0) & (u <= 1.0) {
+			// prepare to test V parameter
+			qvec := tvec.Cross(&edge1)
+			// calculate V parameter and test bounds
+			if v := direction.Dot(qvec) * inv_det; (v >= 0.0) & (u+v <= 1.0) {
+				// calculate t, ray intersects triangle
+				hitDistance = edge2.Dot(qvec) * inv_det
+				// only allow intersection in the forward ray direction
+				isHit = (hitDistance >= 0.0)
+			}
+		}
+	}
+	return isHit, hitDistance
+}
